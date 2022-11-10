@@ -17,8 +17,8 @@ export default (e) => {
   const clouds = new Clouds();
   app.add(clouds);
 
-  useFrame(({ timestamp }) => {
-    clouds.update();
+  useFrame(({ timestamp, timeDiff }) => {
+    clouds.update(timeDiff);
   });
 
   useCleanup(() => {
