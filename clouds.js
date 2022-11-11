@@ -21,13 +21,13 @@ const localColor = new THREE.Color();
 const textureLoader = new THREE.TextureLoader();
 
 // Generation
-const CLOUD_COVERAGE_RADIUS = 70;
-const CLOUD_CARD_SIZE = 60;
-const NUM_CLOUD_CARDS_PER_GROUP = 5;
+const CLOUD_COVERAGE_RADIUS = 65;
+const CLOUD_CARD_SIZE = 50;
+const NUM_CLOUD_CARDS_PER_GROUP = 4;
 const NUM_CLOUD_GROUPS = 12;
 const NUM_CLOUD_INSTANCES = NUM_CLOUD_GROUPS * NUM_CLOUD_CARDS_PER_GROUP;
-const POSITION_VARIATION_RANGE_X = CLOUD_CARD_SIZE / 3;
-const POSITION_VARIATION_RANGE_Y = CLOUD_CARD_SIZE / 2;
+const POSITION_VARIATION_RANGE_X = CLOUD_CARD_SIZE / 4;
+const POSITION_VARIATION_RANGE_Y = CLOUD_CARD_SIZE / 3;
 const POSITION_VARIATION_RANGE_Z = CLOUD_CARD_SIZE / 4;
 const ANGLE_STEP = Math.PI * 2 / NUM_CLOUD_GROUPS;
 const SPHERE_CENTER = new THREE.Vector3(0, 0, 0);
@@ -41,8 +41,8 @@ const CLOUD_BASE_COLOR = {
 };
 
 // Animation
-const CLOUD_ROTATION_BASE_SPEED = 0.005;
-const CLOUD_ROTATION_SPEED_VARIATION_RANGE = 0.015;
+const CLOUD_ROTATION_BASE_SPEED = 0.0035;
+const CLOUD_ROTATION_SPEED_VARIATION_RANGE = 0.0015;
 
 // Arrays
 const upVectorsArray = [];
@@ -53,7 +53,7 @@ const cloudMaterial = new THREE.MeshBasicMaterial({
     side: THREE.DoubleSide,
     transparent: true,
     depthWrite: false,
-    opacity: 0.6
+    opacity: 0.4
 });
 
 const _offsetClouds = (position, color, upVector) => {
@@ -104,7 +104,7 @@ export class Clouds extends THREE.Object3D {
     init = () => {
         // TODO : move this to a CloudPackage
         textureLoader.load(
-            SERVER_URL + 'textures/smoke_07.png',
+            SERVER_URL + 'textures/smoke_02.png',
             (texture) => {
                 cloudMaterial.map = texture;
                 cloudMaterial.needsUpdate = true;
