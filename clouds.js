@@ -102,7 +102,7 @@ export class Clouds extends THREE.Object3D {
     init = () => {
         // TODO : move this to a CloudPackage
         textureLoader.load(
-            BASE_URL + 'textures/smoke_02.png',
+            BASE_URL + '/textures/smoke_02.png',
             (texture) => {
                 cloudMaterial.map = texture;
                 cloudMaterial.needsUpdate = true;
