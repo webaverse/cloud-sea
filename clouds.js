@@ -5,9 +5,7 @@ const {
     useCamera
 } = metaversefile;
 
-// ! REMOVE THIS 
-const SERVER_URL = 'http://localhost:8080/';
-// ! REMOVE THIS 
+const BASE_URL = import.meta.url.replace(/\/[^\/]*$/, '');
 
 const camera = useCamera();
 
@@ -104,7 +102,7 @@ export class Clouds extends THREE.Object3D {
     init = () => {
         // TODO : move this to a CloudPackage
         textureLoader.load(
-            SERVER_URL + 'textures/smoke_02.png',
+            BASE_URL + 'textures/smoke_02.png',
             (texture) => {
                 cloudMaterial.map = texture;
                 cloudMaterial.needsUpdate = true;
