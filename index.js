@@ -13,7 +13,7 @@ export default e => {
   app.add(clouds);
 
   useFrame(({timestamp, timeDiff}) => {
-    clouds.update(timestamp);
+    clouds.update(timestamp, timeDiff);
   });
 
   useCleanup(() => {});

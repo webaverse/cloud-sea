@@ -24,7 +24,8 @@ const CLOUD_BASE_COLOR = {
 };
 
 // Animation
-const CLOUD_ROTATION_SPEED = 0.00001;
+const CLOUD_ROTATION_SPEED = 0.00002;
+const CLOUD_CIRCLE_SPEED  = 0.0000075;
 const CLOUD_BOUNCE_SPEED = 0.00005;
 const CLOUD_BOUNCE_RANGE = 10;
 
@@ -82,20 +83,32 @@ const _offsetClouds = (position, color, upVector) => {
   upVector.set(Math.cos(randomAngle), Math.sin(randomAngle), 0).normalize();
 };
 
-const _rotateCard = (upVector, timestamp) => {
+const _rotateCard = (upVector, time) => {
   const x = upVector.x;
   const y = upVector.y;
 
   const angle = Math.atan2(y, x);
-  const step = Math.PI * 2 * CLOUD_ROTATION_SPEED * timestamp;
+  const step = Math.PI * 2 * CLOUD_ROTATION_SPEED * time;
   const stepAngle = angle + step;
 
   upVector.x = Math.cos(stepAngle);
   upVector.y = Math.sin(stepAngle);
 };
 
-const _bounceCard = (position, basePosition, timestamp, groupRandomValue) => {
-  const speed = timestamp * CLOUD_BOUNCE_SPEED * groupRandomValue;
+const _circleCard = (position, time) => {
+  const x = position.x;
+  const z = position.z;
+
+  const angle = Math.atan2(z, x);
+  const step = Math.PI * 2 * CLOUD_CIRCLE_SPEED * time;
+  const stepAngle = angle + step;
+
+  position.x = SPHERE_CENTER.x + Math.cos(stepAngle) * CLOUD_COVERAGE_RADIUS;
+  position.z = SPHERE_CENTER.z + Math.sin(stepAngle) * CLOUD_COVERAGE_RADIUS;
+};
+
+const _bounceCard = (position, basePosition, time, groupRandomValue) => {
+  const speed = time * CLOUD_BOUNCE_SPEED * groupRandomValue;
   position.y = basePosition.y + Math.sin(speed) * CLOUD_BOUNCE_RANGE;
 };
 
@@ -184,7 +197,7 @@ export class Clouds extends THREE.Object3D {
     }
   };
 
-  update = timestamp => {
+  update = (timestamp, timeDiff) => {
     const cameraPosition = camera.position;
 
     for (let i = 0; i < NUM_CLOUD_GROUPS; i++) {
@@ -207,6 +220,7 @@ export class Clouds extends THREE.Object3D {
 
         const position = localVector5.setFromMatrixPosition(cardMatrix);
         _bounceCard(position, cachedPosition, timestamp, groupRandomValue);
+        _circleCard(position, timeDiff);
 
         // rotate card
         const upVectorArray = upVectorsArray[cloudIndex];
