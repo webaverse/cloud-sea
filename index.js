@@ -1,29 +1,22 @@
-import metaversefile from 'metaversefile';
-import * as THREE from 'three';
-import {Clouds} from './clouds.js';
+import metaversefile from "metaversefile";
+import * as THREE from "three";
+import {Clouds} from "./clouds.js";
 
-const {
-  useApp,
-  useFrame,
-  useCleanup,
-  useCamera
-} = metaversefile;
+const {useApp, useFrame, useCleanup, useCamera} = metaversefile;
 
-export default (e) => {
+export default e => {
   const app = useApp();
 
-  app.name = 'clouds';
+  app.name = "clouds";
 
   const clouds = new Clouds();
   app.add(clouds);
 
-  useFrame(({ timestamp, timeDiff }) => {
-    clouds.update(timeDiff);
+  useFrame(({timestamp, timeDiff}) => {
+    clouds.update(timestamp, timeDiff);
   });
 
-  useCleanup(() => {
-
-  });
+  useCleanup(() => {});
 
   return app;
 };
