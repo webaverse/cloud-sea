@@ -10,9 +10,9 @@ const camera = useCamera();
 const BASE_URL = import.meta.url.replace(/\/[^\/]*$/, "");
 
 // constants
-const CHUNK_SIZE = 60;
-const CHUNK_STEP = 5;
-const CLOUD_SIZE = 50;
+const CHUNK_SIZE = 72;
+const CHUNK_STEP = 3;
+const CLOUD_SIZE = 40;
 const NUM_CLOUDS = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 const CHUNK_WORLD_SIZE = CHUNK_SIZE * CHUNK_STEP;
 const CHUNK_WORLD_CENTER_POS = new THREE.Vector3(0, 0, 0);
@@ -20,13 +20,14 @@ const CHUNK_WORLD_MIN_POS = CHUNK_WORLD_CENTER_POS.subScalar(
   CHUNK_WORLD_SIZE / 2,
 );
 // donut
-const CLOUD_DONUT_RADIUS = 0.5;
+const CLOUD_DONUT_RADIUS = 0.4;
 const CLOUD_DONUT_DEPTH = 0.15;
 // material
 const CLOUD_TEXTURE_OPACITY = 0.4;
+const CLOUD_BRIGHTNESS = 0.9;
 // animation
-const CLOUD_BOUNCE_SPEED = 0.5;
-const CLOUD_ROTATION_SPEED = 0.2;
+const CLOUD_BOUNCE_SPEED = 0.15;
+const CLOUD_ROTATION_SPEED = 0.15;
 const CLOUD_BOUNCE_RANGE = 10;
 
 const textureLoader = new THREE.TextureLoader();
@@ -85,6 +86,8 @@ const cloudFragmentShader = /* glsl */ `
     }
 `;
 
+const _clamp = (n, min, max) => Math.min(Math.max(n, min), max);
+
 const _donutSdf = position => {
   const p = localVector2D2.set(position.x, position.z);
   const q = localVector2D.set(p.length() - CLOUD_DONUT_RADIUS, position.y);
@@ -102,9 +105,9 @@ export class CloudsMesh extends THREE.Object3D {
     this.add(this.mesh);
   }
 
-  sdf(position) {
+  sdf(position, simplex) {
     const donut = _donutSdf(position);
-    return donut - SimplexNoise.simplex3(position.x, position.y, position.z) / 5;
+    return donut - simplex / 10;
   }
 
   generateGeometry() {
@@ -131,17 +134,18 @@ export class CloudsMesh extends THREE.Object3D {
             position.y / divider,
             position.z / divider,
           );
-          const sdf = this.sdf(sdfPosition);
+          const simplex = (SimplexNoise.simplex3(sdfPosition.x, sdfPosition.y, sdfPosition.z) + 1) / 2;
+          const sdf = this.sdf(sdfPosition, simplex);
 
           if (sdf > 0) {
             positions.push(position.x, position.y, position.z);
             position.toArray(cachedPositions, index * 3);
 
-            const fieldValue = (sdf + 1.0) / 2.0;
+            const fieldValue = _clamp((sdf + 1) / 2, 0, 1);
             colors.push(
-              0.75 + fieldValue / 4.0,
-              0.75 + fieldValue / 4.0,
-              0.75 + fieldValue / 4.0,
+              CLOUD_BRIGHTNESS + simplex * (1 - CLOUD_BRIGHTNESS),
+              CLOUD_BRIGHTNESS + simplex * (1 - CLOUD_BRIGHTNESS),
+              CLOUD_BRIGHTNESS + simplex * (1 - CLOUD_BRIGHTNESS),
               fieldValue,
             );
 
@@ -194,7 +198,7 @@ export class CloudsMesh extends THREE.Object3D {
     return position;
   }
 
-  animate(time) {
+  animate(time, timeDiff) {
     // geometry
     const geometry = this.mesh.geometry;
 
@@ -268,8 +272,8 @@ export class CloudsMesh extends THREE.Object3D {
     geometry.index.needsUpdate = true;
   }
 
-  update(timestamp) {
-    this.animate(timestamp / 1000);
+  update({timestamp, timeDiff}) {
+    this.animate(timestamp / 1000, timeDiff / 1000);
     this.sortDepth();
   }
 }
