@@ -1,6 +1,5 @@
 import metaversefile from "metaversefile";
-import * as THREE from "three";
-import {Clouds} from "./clouds.js";
+import { CloudsMesh } from "./clouds-mesh.js";
 
 const {useApp, useFrame, useCleanup, useCamera} = metaversefile;
 
@@ -9,11 +8,11 @@ export default e => {
 
   app.name = "clouds";
 
-  const clouds = new Clouds();
+  const clouds = new CloudsMesh();
   app.add(clouds);
 
   useFrame(({timestamp, timeDiff}) => {
-    clouds.update(timestamp, timeDiff);
+    clouds.update(timestamp);
   });
 
   useCleanup(() => {});
